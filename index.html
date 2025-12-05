@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Insider - Game Conductor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- Home Screen -->
+  <div id="homeScreen" class="screen active">
+    <div class="container">
+      <div class="app-header">
+        <h1 class="app-logo">🎭</h1>
+        <h1 class="app-title" data-i18n="The Insider">The Insider</h1>
+        <span class="app-subtitle">v1.0.0 | by <a href="https://www.instagram.com/golfixed/"
+            target="_blank">@golfixed</a></span>
+      </div>
+
+      <!-- Main Tabs -->
+      <div class="main-tabs">
+        <button class="main-tab-btn active" onclick="showMainTab('main')" data-i18n="Main">Main</button>
+        <button class="main-tab-btn" onclick="showMainTab('words')" data-i18n="Words">Words</button>
+        <button class="main-tab-btn" onclick="showMainTab('players')" data-i18n="Players">Players</button>
+        <button class="main-tab-btn" onclick="showMainTab('statistics')" data-i18n="Stats">Stats</button>
+      </div>
+
+      <!-- Main Tab Content -->
+      <div id="mainTabContent" class="tab-content active">
+        <!-- Group Selection Dropdown -->
+        <div class="group-dropdown-container">
+          <label for="groupDropdown" class="group-dropdown-label" data-i18n="Select Player Group:">Select Player
+            Group:</label>
+          <select id="groupDropdown" class="group-dropdown" onchange="selectGroupFromDropdown(this.value)">
+            <option value="" data-i18n="-- Select a group --">-- Select a group --</option>
+          </select>
+        </div>
+
+        <!-- Scoreboard Section -->
+        <section class="section">
+          <h2>📊 Scoreboard</h2>
+          <div class="scoreboard-tabs">
+            <button class="tab-btn active" onclick="showScoreboard('game')" data-i18n="Current Game">Current
+              Game</button>
+            <button class="tab-btn" onclick="showScoreboard('today')" data-i18n="Today">Today</button>
+            <button class="tab-btn" onclick="showScoreboard('alltime')" data-i18n="All Time">All Time</button>
+          </div>
+          <div id="scoreboardContent" class="scoreboard-content"></div>
+        </section>
+
+        <!-- Game Controls -->
+        <div class="game-controls">
+          <div class="input-group" style="margin-bottom: 15px;">
+            <input type="text" id="customWordInput" data-i18n-placeholder="Enter custom word (optional)"
+              placeholder="Enter custom word (optional)"
+              style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ddd; border-radius: 5px;">
+          </div>
+          <button onclick="startGame()" class="btn-start btn-start-large" id="startGameBtn"
+            data-i18n="Start New Game">Start New Game</button>
+        </div>
+      </div>
+
+      <!-- Words Tab Content -->
+      <div id="wordsTabContent" class="tab-content">
+        <section class="section">
+          <h2 data-i18n="Word Management">📝 Word Management</h2>
+          <div class="input-group">
+            <input type="text" id="wordInput" data-i18n-placeholder="Enter word" placeholder="Enter word">
+            <button onclick="addWord()" data-i18n="Add Word">Add Word</button>
+          </div>
+          <div id="wordsList" class="list"></div>
+        </section>
+      </div>
+
+      <!-- Players Tab Content -->
+      <div id="playersTabContent" class="tab-content">
+        <!-- Player Groups Section -->
+        <section class="section">
+          <h2 data-i18n="Player Groups">👥 Player Groups</h2>
+          <div class="input-group">
+            <input type="text" id="groupNameInput" data-i18n-placeholder="Enter group name"
+              placeholder="Enter group name">
+            <button onclick="addGroup()" data-i18n="Add Group">Add Group</button>
+          </div>
+          <div id="groupsList" class="list"></div>
+        </section>
+
+        <!-- Players in Selected Group -->
+        <section class="section" id="playersInGroupSection" style="display: none;">
+          <h2 id="currentGroupTitle">Players in Group</h2>
+          <div class="input-group">
+            <input type="text" id="playerNameInput" data-i18n-placeholder="Enter player name"
+              placeholder="Enter player name">
+            <button onclick="addPlayerToGroup()" data-i18n="Add Player">Add Player</button>
+          </div>
+          <div id="playersList" class="list"></div>
+        </section>
+      </div>
+
+      <!-- Statistics Tab Content -->
+      <div id="statisticsTabContent" class="tab-content">
+        <section class="section">
+          <h2 data-i18n="All-Time Leaderboard">📈 All-Time Leaderboard</h2>
+          <button onclick="showAllTimeScores()" class="btn-secondary" style="width: 100%; margin-bottom: 20px;"
+            data-i18n="View All-Time Scores">View All-Time Scores</button>
+        </section>
+
+        <!-- Reset Statistics -->
+        <section class="section">
+          <h2 data-i18n="Reset Statistics">🔄 Reset Statistics</h2>
+          <div class="reset-section">
+            <button onclick="resetStatistics()" class="btn-reset" data-i18n="Reset All Statistics">Reset All
+              Statistics</button>
+            <div id="lastResetDate" class="reset-date"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Language Switcher -->
+      <div class="language-switcher">
+        <button onclick="switchLanguage('en')" id="langBtnEn" class="lang-btn">English</button>
+        <button onclick="switchLanguage('th')" id="langBtnTh" class="lang-btn">ไทย</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Countdown Screen -->
+  <div id="countdownScreen" class="screen">
+    <div class="container">
+      <div class="countdown-container">
+        <div id="countdownNumber" class="countdown-number">3</div>
+        <div class="countdown-text">Preparing game...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="gameScreen" class="screen">
+    <div class="container">
+      <h1>🎮 Game in Progress</h1>
+
+      <div class="game-info">
+        <div class="info-card word-card">
+          <h3>Selected Word</h3>
+          <div id="currentWord" class="word-display">-</div>
+        </div>
+
+        <div class="info-card">
+          <h3>Insider(s)</h3>
+          <div id="insidersList" class="insiders-list compact-list"></div>
+        </div>
+
+        <div class="info-card">
+          <h3>Players</h3>
+          <div id="gamePlayersList" class="players-list compact-list game-players-list"></div>
+        </div>
+      </div>
+
+      <div class="game-actions">
+        <button onclick="endRound()" class="btn-end">End Round</button>
+        <button onclick="finishGame()" class="btn-secondary">Finish Game & View Summary</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Game Screen -->
+  <div id="endGameScreen" class="screen">
+    <div class="container">
+      <h1>🏁 Game Ended</h1>
+
+      <div class="winner-selection">
+        <h2>Who won this round?</h2>
+        <div class="winner-buttons">
+          <button onclick="recordWin('insiders')" class="btn-winner">Insiders Win</button>
+          <button onclick="recordWin('players')" class="btn-winner">Players Win</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Round Summary Screen -->
+  <div id="roundSummaryScreen" class="screen">
+    <div class="container">
+      <h1>📊 Round Summary</h1>
+
+      <div id="roundSummaryContent" class="summary-content"></div>
+
+      <div class="summary-actions">
+        <button onclick="continueToNextRound()" class="btn-start">Start Next Round</button>
+        <button onclick="finishGame()" class="btn-secondary">Finish Game</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Summary Screen -->
+  <div id="summaryScreen" class="screen">
+    <div class="container">
+      <h1>📋 Game Summary</h1>
+
+      <div id="gameSummaryContent" class="summary-content"></div>
+
+      <div class="summary-actions">
+        <button onclick="backToHome()" class="btn-primary">Back to Home</button>
+        <button onclick="startNewGame()" class="btn-start">Start New Game</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- All-Time Scores Screen -->
+  <div id="allTimeScoresScreen" class="screen">
+    <div class="container">
+      <h1>🏆 All-Time Scores</h1>
+
+      <div id="allTimeScoresContent" class="scores-content"></div>
+
+      <div class="summary-actions">
+        <button onclick="backToHome()" class="btn-primary">Back to Home</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="lang.js"></script>
+  <script type="module" src="words.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
